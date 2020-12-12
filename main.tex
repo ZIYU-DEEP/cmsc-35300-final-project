@@ -1,4 +1,5 @@
 \documentclass{article}
+\usepackage{float}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
@@ -34,7 +35,7 @@
 \usemintedstyle{monokai}
 \usepackage{booktabs}
 
-\title{Evaluating Adversarial Robustness of Linear Models:\\Sparsity and Kernels}
+\title{Evaluating Adversarial Robustness of Linear Models:\\On Sparsity and Kernels}
 % Understanding 2020 Poll Results
 \author{%
   Shawn Shan, Ziyu Ye \\
@@ -67,7 +68,7 @@ Specifically, we are interested in how linear models behaves under adversarial a
 
 \paragraph{Adversarial robustness of linear models.} ~\cite{biggio2011support} first attempts to attack support vector machines (SVMs) by injecting label noise and propose to improve the robustness by kernel matrix correction. ~\cite{bat2012svm} proposes a poison attack on SVMs by gradient ascent, and ~\cite{liu2017robust} suggests a defense against it by approximating features by a low-rank matrix. Later on, ~\cite{megyeri2019adversarial} shows that linear classifier are less robust when facing higher-dimensional inputs. ~\cite{shi2019understanding} claims that an adversarially robust linear classifier requires higher signal-to-noise ratio, and ~\cite{javanmard2020precise} further confirms this by illustrating the tradeoffs of robustness and accuray for linear models.
 
-\paragraph{The effect of sparsity.} ~\cite{gop2018combating} discusses that learning a sparse representation of input data helps to improve adversarial robustness. ~\cite{guo2018sparse} further illustrates the intrinsic relationship of model sparsity and adversarial robustness.
+\paragraph{The effect of sparsity.} ~\cite{gop2018combating} discusses that learning a sparse representation of input data helps to improve adversarial robustness. ~\cite{guo2018sparse, wang2020achieving} further illustrate the intrinsic relationship of model sparsity and adversarial robustness.
 
 \paragraph{The effect of kernels.} To the best of our knowledge, we are \textbf{the first} to study the effect of different kernels for linear models under adversarial attacks. Prior work mainly focuses on designing attacks on linear models when kernel is present ~\cite{biggio2011support}, or designing defenses with a certain kernel ~\cite{hao2019defending, taghanaki2019kernelized}.
 
@@ -84,13 +85,12 @@ In evaluating the effect of \textbf{sparsity}, we consider \textit{regularized l
 
 
 
-%============================================
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experiment Results}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %============================================
-%============================================
-
-
 \subsection{Datasets and Experiment Setup}
+%============================================
   
 \paragraph{Dataset and Classifier. } We use the popular MNIST dataset~\cite{lecun1995mnist}. This task seeks to recognize $10$ handwritten digits in black and white images. The dataset consists of $60,000$ training images and $10,000$ test images. In addition to this, we also use the Iris dataset~\cite{fisher1936uci}, which consists of $150$ images with $3$ classes and $4$ features. We use a multi-class logistic regression (\textit{i.e.} softmax) classifier.
 
@@ -126,7 +126,7 @@ If we use $L^{1}$ regularization:
 \end{equation}
 
 
-\begin{figure*}[h!]
+\begin{figure}[H]
   \centering
   \begin{minipage}{0.48\textwidth}
   \centering
@@ -142,10 +142,10 @@ If we use $L^{1}$ regularization:
   \label{fig:l2-iris}
   \end{minipage}
   \hfill
-\end{figure*}
+\end{figure}
 
 
-\begin{figure*}[h!]
+\begin{figure}[H]
   \centering
   \begin{minipage}{0.48\textwidth}
   \centering
@@ -158,10 +158,14 @@ If we use $L^{1}$ regularization:
   \centering
     \includegraphics[width=0.8\textwidth]{sparsity.png}
   \caption{Logistic regression classifier's normal classification accuracy and model robustness as lambda increase in $L^{2}$ regularization on MNIST dataset. }
-  \label{fig:l2}
+  \label{fig:l2-mnist}
   \end{minipage}
   \hfill
-\end{figure*}
+\end{figure}
+
+From Figure \ref{fig:l1-iris}-\ref{fig:l2-mnist}, we can clearly observe a tradeoff between classification accuracy and model robustness. Specifically, as the model becomes sparser, the model robustness would improve yet with the cost of accuracy drop. 
+
+Nevertheless, the important message here is that \textbf{sparsity} is an important contributing factor to model robustness. An intuitive understanding is that as the model becomes sparser, the distribution of weights would be more concentrated around the zero point with less fluctuations, making it harder to construct successful attack against the model.
 
 
 %============================================
@@ -172,12 +176,16 @@ We consider the following kernel functions:
     \item linear kernel: $\kappa (\bm{x}_{i}, \bm{x}_{j})=\bm{x}_{i}^{T}\bm{x}_{j}$
     \item polynomial kernel: $\kappa (\bm{x}_{i}, \bm{x}_{j})=(\bm{x}_{i}^{T}\bm{x}_{j})^{d}$
     \item sigmoid kernel: $\kappa (\bm{x}_{i}, \bm{x}_{j})=\text{tanh}(\beta \bm{x}_{i}^{T}\bm{x}_{j} + \theta)$
+    \item Gaussian (RBF) kernel: $\kappa \left(\bm{x}_{i}, \bm{x}_{j}\right)=\exp \left(-\frac{\left\|\bm{x}_{i}-\bm{x}_{j}\right\|^{2}}{2 \sigma^{2}}\right)$
+    \item Laplacian kernel: $\kappa \left(\bm{x}_{i}, \bm{x}_{j}\right)=\exp \left(-\frac{\left\|\bm{x}_{i}-\bm{x}_{j}\right\|}{\sigma}\right)$
 \end{itemize}
+
+\fixme{We can set the regularization $R(w)=0$ in this section. Please choose some kernel functions easy to implement from the above. Do not forget to include the model with no kernel.}
 
 %============================================
 \section{Conclusion}
 %============================================
-Overall, we have evaluated the adversarial robustness of (generalized) linear models.
+Overall, we have evaluated the adversarial robustness of (generalized) linear models. Our empirical results suggests that there is a strong relationship between model sparsity and adversarial robustness. In addition, we found kernel functions play an important role in making linear models more robust, while \fixme{???} kernel is the most effective one.
 
 
 
