@@ -1,0 +1,126 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{minted}
+\usepackage[final]{nips}
+\usepackage{outlines}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{float}
+\usepackage{lipsum}
+\usepackage{caption}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{enumitem,amssymb}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+\newcommand{\done}{\rlap{$\square$}{\raisebox{2pt}{\large\hspace{1pt}\cmark}}
+\hspace{-2pt}}
+\newcommand{\wontfix}{\rlap{$\square$}{\large\hspace{1pt}\xmark}}
+\captionsetup[table]{position=bottom, skip=2pt}
+\hypersetup{colorlinks=true, linkcolor=blue, filecolor=magenta, urlcolor=cyan}
+\newcommand{\fixme}[1]{{\color{red} #1}}
+
+\urlstyle{same}
+\usemintedstyle{monokai}
+\usepackage{booktabs}
+
+\title{Evaluating Adversarial Robustness of Linear Models:\\Kernels and Sparsity}
+% Understanding 2020 Poll Results
+\author{%
+  Shawn Shan, Ziyu Ye \\
+  Department of Computer Science\\
+  University of Chicago\\
+  {shansixiong, ziyuye}@uchicago.edu \\
+}
+\begin{document}
+\maketitle
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \begin{abstract}
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Robustness is an essential property for a system which indicates if the system can work reliably and stably. In machine learning systems, we are especially concerned about \textbf{adversarial robustness} which considers the robustness of the system when facing adversarial inputs. While there exists rich literature in adversarial attacks in deep neural networks (DNNs)~\cite{hao2020adversarial}, the fundamental principle for adversarial robustness is far from understood.
+
+In this paper, we aim to understand adversarial robustness from the perspective of \textbf{linear models}. We believe our work would help fill the gap of current adversarial robustness study in linear models, and such simplified models should provide relevant insights and heuristics for the more complex scenarios with DNNs.
+
+Specifically, we are interested in how linear models behaves under adversarial attacks with different \textbf{kernels} and \textbf{sparsity}. We choose these two factors as we believe they are fundamental in modern linear models and have close connections to practical DNNs.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Literature Review}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Adversarial robustness of linear models.} ~\cite{biggio2011support} first attempts to attack support vector machines (SVMs) by injecting label noise and propose to improve the robustness by kernel matrix correction. ~\cite{bat2012svm} proposes a poison attack on SVMs by gradient ascent, and ~\cite{liu2017robust} suggests a defense against it by approximating features by a low-rank matrix. Later on, ~\cite{megyeri2019adversarial} shows that linear classifier are less robust when facing higher-dimensional inputs. ~\cite{shi2019understanding} claims that an adversarially robust linear classifier requires higher signal-to-noise ratio, and ~\cite{javanmard2020precise} further confirms this by illustrating the tradeoffs of robustness and accuray for linear models.
+
+\paragraph{The effect of kernels.} To the best of our knowledge, we are \textbf{the first} to study the effect of different kernels for linear models under adversarial attacks. Prior work mainly focuses on designing attacks on linear models when kernel is present ~\cite{biggio2011support}, or designing defenses with a certain kernel ~\cite{hao2019defending, taghanaki2019kernelized}.
+
+\paragraph{The effect of sparsity.} ~\cite{gop2018combating} discusses that learning a sparse representation of input data helps to improve adversarial robustness. ~\cite{guo2018sparse} further illustrates the intrinsic relationship of model sparsity and adversarial robustness.
+
+Based upon the existing literature, our work features by a comprehensive analysis on the family of generalized linear models from the two aspects mentioned above.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Problem Statement}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+We are interested in how (generalized) linear models behave under different settings of activation, kernel function and sparsity. We consider models from the family of \textbf{Regularized Kernel Regression}.
+
+In evaluating the effect of \textbf{kernels}, we consider \textit{kernel SVM} using linear, polynomial, Gaussian or sigmoid kernels; in evaluating the effect of \textbf{sparsity}, we consider \textit{regularized linear regression} using $L^{1}$ regularization (\textit{i.e.} lasso regression) or $L^{2}$ regularization (\textit{i.e.} ridge regression).
+
+
+
+%============================================
+\section{Experiment Results}
+%============================================
+%============================================
+
+
+\subsection{Datasets and Experiment Setup}
+  
+\paragraph{Dataset and Classifier. } We uses the popular MNIST dataset~\cite{lecun1995mnist}. This task seeks to recognize $10$ handwritten digits in black and white images. The dataset consists of $60,000$ training images and $10,000$ test images. We uses a multi-class logistic regression classifier. 
+
+\paragraph{Adversarial Attack Setup. } We implement a simple FGSM attack~\cite{goodfellow2014explaining}. FGSM attack 
+creates an adversarial perturbation for an input $x$ by computing a single step in the direction of the gradient of the model's loss function at $x$ and multiplying the resultant sign vector by a small value $\eta$. The adversarial perturbation $\epsilon$ is generated via:
+\[
+\epsilon = \eta \cdot \text{sign}(\nabla_x \ell(\model(x), y_t)).
+\]
+We choose $\eta = 0.05$ in our experiment, the same as previous works~\cite{shan2020gotta,xu2017feature}. As there are more complex and stronger attacks such as CW~\cite{cwattack} attack, however, CW attack has overly complex optimization iterations making standardized evaluation on the model hard. 
+
+% \subsection{The Effect of Activation}
+%============================================
+
+%============================================
+\subsection{The Effect of Kernels}
+%============================================
+
+%============================================
+\subsection{The Effect of Sparsity}
+
+%============================================
+To reduce model sparsity, we introduce regularization into the loss function of the logistic regression model. 
+
+%============================================
+\section{Conclusion}
+%============================================
+Overall, we have evaluated the adversarial robustness of (generalized) linear models.
+
+
+
+%============================================
+\newpage
+\bibliographystyle{plain}
+\bibliography{final}
+%============================================
+
+\end{document}
